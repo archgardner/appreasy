@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: appreasy
+      POSTGRES_PASSWORD: appreasy
+      POSTGRES_DB: appreasy
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports: ["5432:5432"]
+
+  backend:
+    build: ./backend
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://appreasy:appreasy@db:5432/appreasy
+      - APP_SECRET=change-me-in-production
+    depends_on: [db]
+    ports: ["8000:80"]
+
+  frontend:
+    build: ./frontend
+    depends_on: [backend]
+    ports: ["3000:80"]
+
+volumes:
+  db_data:
